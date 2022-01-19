@@ -22,9 +22,9 @@ package eu.europa.ec.dgc.businessrule.service;
 
 import eu.europa.ec.dgc.businessrule.entity.ListType;
 import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
-import eu.europa.ec.dgc.businessrule.model.DomesticRuleItem;
+import eu.europa.ec.dgc.businessrule.model.BoosterNotificationRuleItem;
 import eu.europa.ec.dgc.businessrule.repository.SignedListRepository;
-import eu.europa.ec.dgc.businessrule.restapi.dto.DomesticRuleListItemDto;
+import eu.europa.ec.dgc.businessrule.restapi.dto.BoosterNotificationRuleListItemDto;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class DomesticRuleService {
+public class BoosterNotificationRuleService {
 
-    private final Map<String, DomesticRuleItem> domesticRuleMap = new HashMap<>();
+    private final Map<String, BoosterNotificationRuleItem> boosterNotificationRuleMap = new HashMap<>();
     private final ListSigningService listSigningService;
     private final Optional<SigningService> signingService;
     private final SignedListRepository signedListRepository;
@@ -53,19 +53,19 @@ public class DomesticRuleService {
      */
     @PostConstruct
     @Transactional
-    public void domesticRuleServiceInit() {
-        listSigningService.updateSignedList(getRulesList(), ListType.DomesticRules);
+    public void boosterNotificationRuleServiceInit() {
+        listSigningService.updateSignedList(getRulesList(), ListType.BnRules);
     }
 
 
     /**
      * Gets list of all rules ids and hashes.
      */
-    public List<DomesticRuleListItemDto> getRulesList() {
+    public List<BoosterNotificationRuleListItemDto> getRulesList() {
 
-        return domesticRuleMap.values().stream()
-            .sorted(Comparator.comparing(DomesticRuleItem::getIdentifier))
-            .map(rule -> new DomesticRuleListItemDto(
+        return boosterNotificationRuleMap.values().stream()
+            .sorted(Comparator.comparing(BoosterNotificationRuleItem::getIdentifier))
+            .map(rule -> new BoosterNotificationRuleListItemDto(
                 rule.getIdentifier(),
                 rule.getVersion(),
                 rule.getHash()
@@ -73,7 +73,7 @@ public class DomesticRuleService {
     }
 
     public Optional<SignedListEntity> getRulesSignedList() {
-        return signedListRepository.findById(ListType.DomesticRules);
+        return signedListRepository.findById(ListType.BnRules);
     }
 
 
@@ -81,8 +81,8 @@ public class DomesticRuleService {
      * Gets  a rule by hash.
      */
     @Transactional
-    public DomesticRuleItem getRuleByHash(String hash) {
-        return domesticRuleMap.get(hash);
+    public BoosterNotificationRuleItem getRuleByHash(String hash) {
+        return boosterNotificationRuleMap.get(hash);
     }
 
     /**
@@ -91,14 +91,14 @@ public class DomesticRuleService {
      * @param rules list of actual value sets
      */
     @Transactional
-    public void updateRules(List<DomesticRuleItem> rules) {
-        domesticRuleMap.clear();
+    public void updateRules(List<BoosterNotificationRuleItem> rules) {
+        boosterNotificationRuleMap.clear();
 
-        for (DomesticRuleItem rule : rules) {
+        for (BoosterNotificationRuleItem rule : rules) {
             saveRule(rule);
         }
 
-        listSigningService.updateSignedList(getRulesList(), ListType.DomesticRules);
+        listSigningService.updateSignedList(getRulesList(), ListType.BnRules);
     }
 
     /**
@@ -107,9 +107,9 @@ public class DomesticRuleService {
      * @param rule The rule to be saved.
      */
     @Transactional
-    public void saveRule(DomesticRuleItem rule) {
+    public void saveRule(BoosterNotificationRuleItem rule) {
         signingService.ifPresent(service -> rule.setSignature(service.computeSignature(rule.getHash())));
-        domesticRuleMap.put(rule.getHash(), rule);
+        boosterNotificationRuleMap.put(rule.getHash(), rule);
     }
 
 }

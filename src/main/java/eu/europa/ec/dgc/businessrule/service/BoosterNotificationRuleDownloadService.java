@@ -20,8 +20,8 @@
 
 package eu.europa.ec.dgc.businessrule.service;
 
-import eu.europa.ec.dgc.businessrule.exception.DomesticRuleParseException;
-import eu.europa.ec.dgc.businessrule.model.DomesticRuleItem;
+import eu.europa.ec.dgc.businessrule.exception.BoosterNotificationRuleParseException;
+import eu.europa.ec.dgc.businessrule.model.BoosterNotificationRuleItem;
 import eu.europa.ec.dgc.businessrule.utils.BusinessRulesUtils;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -46,8 +46,8 @@ import org.springframework.vault.core.VaultTemplate;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@ConditionalOnProperty("dgc.domestic-mode.enabled")
-public class DomesticRuleDownloadService {
+@ConditionalOnProperty("dgc.booster-mode.enabled")
+public class BoosterNotificationRuleDownloadService {
 
     private final String identifierKeyName = "identifier";
     private final String versionKeyName = "version";
@@ -57,27 +57,27 @@ public class DomesticRuleDownloadService {
         versionKeyName,
         rawDataKeyName);
 
-    @Value("${dgc.domestic-mode.key-store}")
+    @Value("${dgc.booster-mode.key-store}")
     private String keyStoreName;
 
-    @Value("${dgc.domestic-mode.base-path}")
+    @Value("${dgc.booster-mode.base-path}")
     private String rulesBasePath;
 
     private final VaultTemplate vaultTemplate;
     private final BusinessRulesUtils businessRulesUtils;
-    private final DomesticRuleService domesticRuleService;
+    private final BoosterNotificationRuleService boosterNotificationRuleService;
 
     /**
-     * A service to download the domestic rules from a vault key value store.
+     * A service to download the booster notification rules from a vault key value store.
      */
-    @Scheduled(fixedDelayString = "${dgc.domesticRulesDownload.timeInterval}")
-    @SchedulerLock(name = "DomesticRulesDownloadService_downloadDomesticRules", lockAtLeastFor = "PT0S",
-        lockAtMostFor = "${dgc.domesticRulesDownload.lockLimit}")
+    @Scheduled(fixedDelayString = "${dgc.boosterNotificationRulesDownload.timeInterval}")
+    @SchedulerLock(name = "BoosterNotificationRulesDownloadService_downloadBnRules", lockAtLeastFor = "PT0S",
+        lockAtMostFor = "${dgc.boosterNotificationRulesDownload.lockLimit}")
     public void downloadRules() {
 
-        List<DomesticRuleItem> ruleItems = new ArrayList<>();
+        List<BoosterNotificationRuleItem> ruleItems = new ArrayList<>();
 
-        log.info("Domestic rules download started");
+        log.info("Booster notification rules download started");
 
         VaultKeyValueOperations kv = vaultTemplate.opsForKeyValue(
             keyStoreName,
@@ -87,33 +87,33 @@ public class DomesticRuleDownloadService {
 
 
         for (String ruleKey : ruleKeys) {
-            DomesticRuleItem ruleItem;
+            BoosterNotificationRuleItem ruleItem;
 
             try {
                 ruleItem = getRuleFromVaultData(kv, ruleKey);
                 ruleItems.add(ruleItem);
             } catch (NoSuchAlgorithmException e) {
-                log.error("Failed to hash domestic rules on download.", e);
+                log.error("Failed to hash booster notification rules on download.", e);
                 return;
-            } catch (DomesticRuleParseException e) {
+            } catch (BoosterNotificationRuleParseException e) {
                 log.error("Failed to parse rule with rule key: " + ruleKey);
             }
         }
 
         if (!ruleItems.isEmpty()) {
-            domesticRuleService.updateRules(ruleItems);
+            boosterNotificationRuleService.updateRules(ruleItems);
         } else {
-            log.warn("The download of the domestic rules seems to fail, as the download connector "
+            log.warn("The download of the Booster notification rules seems to fail, as the download connector "
                 + "returns an empty rules list.-> No data was changed.");
         }
 
 
-        log.info("Domestic rules download finished");
+        log.info("Booster notification rules download finished");
     }
 
-    private DomesticRuleItem getRuleFromVaultData(VaultKeyValueOperations kv, String ruleKey)
-        throws NoSuchAlgorithmException, DomesticRuleParseException {
-        DomesticRuleItem ruleItem = new DomesticRuleItem();
+    private BoosterNotificationRuleItem getRuleFromVaultData(VaultKeyValueOperations kv, String ruleKey)
+        throws NoSuchAlgorithmException, BoosterNotificationRuleParseException {
+        BoosterNotificationRuleItem ruleItem = new BoosterNotificationRuleItem();
         Map<String, Object> ruleRawData = kv.get(ruleKey).getData();
 
         if (!ruleRawData.keySet().containsAll(expectedKeys)) {
@@ -121,7 +121,7 @@ public class DomesticRuleDownloadService {
                 "Not all expected keys value pairs present. Expected: %s , Received: %s",
                 expectedKeys,
                 ruleRawData.keySet()));
-            throw new DomesticRuleParseException();
+            throw new BoosterNotificationRuleParseException();
         }
 
         ruleItem.setIdentifier(ruleRawData.get(identifierKeyName).toString());

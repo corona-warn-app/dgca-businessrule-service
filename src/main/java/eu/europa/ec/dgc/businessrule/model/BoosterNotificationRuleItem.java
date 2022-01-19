@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DomesticRuleItem {
+public class BoosterNotificationRuleItem {
 
     private String hash;
 
