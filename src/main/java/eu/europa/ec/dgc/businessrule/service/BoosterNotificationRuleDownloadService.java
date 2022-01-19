@@ -71,8 +71,6 @@ public class BoosterNotificationRuleDownloadService {
      * A service to download the booster notification rules from a vault key value store.
      */
     @Scheduled(fixedDelayString = "${dgc.boosterNotificationRulesDownload.timeInterval}")
-    @SchedulerLock(name = "BoosterNotificationRulesDownloadService_downloadBnRules", lockAtLeastFor = "PT0S",
-        lockAtMostFor = "${dgc.boosterNotificationRulesDownload.lockLimit}")
     public void downloadRules() {
 
         List<BoosterNotificationRuleItem> ruleItems = new ArrayList<>();

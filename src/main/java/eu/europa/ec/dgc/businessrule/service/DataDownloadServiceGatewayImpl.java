@@ -62,8 +62,6 @@ public class DataDownloadServiceGatewayImpl implements DataDownloadService {
 
     @Override
     @Scheduled(fixedDelayString = "${dgc.businessRulesDownload.timeInterval}")
-    @SchedulerLock(name = "GatewayDataDownloadService_downloadBusinessRules", lockAtLeastFor = "PT0S",
-        lockAtMostFor = "${dgc.businessRulesDownload.lockLimit}")
     public void downloadRules() {
         List<BusinessRuleItem> ruleItems;
 
