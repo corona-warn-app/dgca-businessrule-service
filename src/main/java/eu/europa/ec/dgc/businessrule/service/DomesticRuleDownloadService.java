@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -71,8 +70,6 @@ public class DomesticRuleDownloadService {
      * A service to download the domestic rules from a vault key value store.
      */
     @Scheduled(fixedDelayString = "${dgc.domesticRulesDownload.timeInterval}")
-    @SchedulerLock(name = "DomesticRulesDownloadService_downloadDomesticRules", lockAtLeastFor = "PT0S",
-        lockAtMostFor = "${dgc.domesticRulesDownload.lockLimit}")
     public void downloadRules() {
 
         List<DomesticRuleItem> ruleItems = new ArrayList<>();

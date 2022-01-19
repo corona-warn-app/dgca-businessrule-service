@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import net.minidev.json.JSONArray;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -62,6 +61,8 @@ public class DataDownloadServiceGatewayImpl implements DataDownloadService {
 
     @Override
     @Scheduled(fixedDelayString = "${dgc.businessRulesDownload.timeInterval}")
+    @SchedulerLock(name = "GatewayDataDownloadService_downloadBusinessRules", lockAtLeastFor = "PT0S",
+        lockAtMostFor = "${dgc.businessRulesDownload.lockLimit}")
     public void downloadRules() {
         List<BusinessRuleItem> ruleItems;
 
