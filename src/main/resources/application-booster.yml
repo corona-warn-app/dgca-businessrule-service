@@ -1,6 +1,0 @@
-dgc:
-  booster-mode:
-    enabled: true
-    key-store: "cwa-dcc-rules-booster-data"
-    base-path: "/"
-

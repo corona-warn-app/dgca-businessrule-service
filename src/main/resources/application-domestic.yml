@@ -1,6 +1,17 @@
 dgc:
-  domestic-mode:
+  boosterNotificationRulesDownload:
     enabled: true
     key-store: "cwa-dcc-rules-booster-data"
     base-path: "/"
+    timeInterval: 1800000
+    lockLimit: 3600000
+
+  domesticRulesDownload:
+    enabled: true
+    key-store: "cwa-dcc-rules-domestic-data"
+    base-path: "/"
+    timeInterval: 1800000
+    lockLimit: 3600000
+
+
 

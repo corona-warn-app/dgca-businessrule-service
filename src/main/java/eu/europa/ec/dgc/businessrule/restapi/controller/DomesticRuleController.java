@@ -22,10 +22,10 @@ package eu.europa.ec.dgc.businessrule.restapi.controller;
 
 import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
 import eu.europa.ec.dgc.businessrule.exception.DgcaBusinessRulesResponseException;
-import eu.europa.ec.dgc.businessrule.model.BoosterNotificationRuleItem;
-import eu.europa.ec.dgc.businessrule.restapi.dto.BoosterNotificationRuleListItemDto;
+import eu.europa.ec.dgc.businessrule.model.DomesticRuleItem;
+import eu.europa.ec.dgc.businessrule.restapi.dto.DomesticRuleListItemDto;
 import eu.europa.ec.dgc.businessrule.restapi.dto.ProblemReportDto;
-import eu.europa.ec.dgc.businessrule.service.BoosterNotificationRuleService;
+import eu.europa.ec.dgc.businessrule.service.DomesticRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -52,25 +52,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/bnrules")
+@RequestMapping("/domesticrules")
 @Slf4j
-@ConditionalOnExpression("${dgc.boosterNotificationRulesDownload.enabled:false} == true")
+@ConditionalOnExpression("${dgc.domesticRulesDownload.enabled:false} == true")
 @RequiredArgsConstructor
-public class BoosterNotificationRuleController {
+public class DomesticRuleController {
 
     private static final String API_VERSION_HEADER = "X-VERSION";
 
     public static final String X_SIGNATURE_HEADER = "X-SIGNATURE";
 
-    private final BoosterNotificationRuleService boosterNotificationRuleService;
+    private final DomesticRuleService domesticRuleService;
 
     /**
      * Http Method for getting the rules list.
      */
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Gets the a list of all booster notification rule ids and hash values.",
-        description = "This method returns a list containing the ids and hash values of all booster notification "
+        summary = "Gets the a list of all domestic rule ids and hash values.",
+        description = "This method returns a list containing the ids and hash values of all domestic "
             + "rules. The hash value can be used to check, if a rule has changed and needs to be updated. "
             + "The hash value can also be used to download a specific rule afterwards.",
         tags = {"Booster Notification Rules"},
@@ -88,13 +88,13 @@ public class BoosterNotificationRuleController {
                 description = "Returns a list of all rule ids and hash values.",
                 content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = BoosterNotificationRuleListItemDto.class))))
+                    array = @ArraySchema(schema = @Schema(implementation = DomesticRuleListItemDto.class))))
         }
     )
-    public ResponseEntity<List<BoosterNotificationRuleListItemDto>> getRules(
+    public ResponseEntity<List<DomesticRuleListItemDto>> getRules(
         @RequestHeader(value = API_VERSION_HEADER, required = false) String apiVersion
     ) {
-        Optional<SignedListEntity> rulesList = boosterNotificationRuleService.getRulesSignedList();
+        Optional<SignedListEntity> rulesList = domesticRuleService.getRulesSignedList();
         ResponseEntity responseEntity;
         if (rulesList.isPresent()) {
             ResponseEntity.BodyBuilder respBuilder = ResponseEntity.ok();
@@ -106,7 +106,7 @@ public class BoosterNotificationRuleController {
             }
             responseEntity = respBuilder.body(rulesList.get().getRawData());
         } else {
-            responseEntity = ResponseEntity.ok(boosterNotificationRuleService.getRulesList());
+            responseEntity = ResponseEntity.ok(domesticRuleService.getRulesList());
         }
         return responseEntity;
     }
@@ -182,8 +182,8 @@ public class BoosterNotificationRuleController {
             throw new DgcaBusinessRulesResponseException(HttpStatus.BAD_REQUEST, "0x005", "Possible reasons: "
                 + "The provided hash value is not correct", hash, "");
         }
-        BoosterNotificationRuleItem rule =
-            boosterNotificationRuleService.getRuleByHash(hash);
+        DomesticRuleItem rule =
+            domesticRuleService.getRuleByHash(hash);
 
         if (rule == null) {
             throw new DgcaBusinessRulesResponseException(HttpStatus.NOT_FOUND, "0x006", "Possible reasons: "
@@ -192,7 +192,7 @@ public class BoosterNotificationRuleController {
 
         if (rule.getSignature() != null) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(BoosterNotificationRuleController.X_SIGNATURE_HEADER, rule.getSignature());
+            responseHeaders.set(DomesticRuleController.X_SIGNATURE_HEADER, rule.getSignature());
             responseEntity = ResponseEntity.ok().headers(responseHeaders).body(rule.getRawData());
         } else {
             responseEntity = ResponseEntity.ok(rule.getRawData());
