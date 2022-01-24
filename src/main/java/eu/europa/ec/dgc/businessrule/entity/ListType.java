@@ -1,5 +1,5 @@
 package eu.europa.ec.dgc.businessrule.entity;
 
 public enum ListType {
-    Rules, ValueSets, BnRules, DomesticRules
+    Rules, ValueSets, BnRules, CCLRules, DomesticRules
 }

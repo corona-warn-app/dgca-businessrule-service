@@ -6,6 +6,13 @@ dgc:
     timeInterval: 1800000
     lockLimit: 3600000
 
+  cclRulesDownload:
+    enabled: true
+    key-store: "cwa-dcc-rules-ccl-data"
+    base-path: "/"
+    timeInterval: 1800000
+    lockLimit: 3600000
+
   domesticRulesDownload:
     enabled: true
     key-store: "cwa-dcc-rules-domestic-data"

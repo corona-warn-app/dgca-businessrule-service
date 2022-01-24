@@ -3,5 +3,5 @@ spring:
     vault:
       enabled: true
       # use for local vault transit test (change the access token)
-      token: s.UKzMQbB9LKukXeGaD199BuIq
+      token: s.mMWZn42xBHSR7JGtxmxmDnCN
       scheme: http

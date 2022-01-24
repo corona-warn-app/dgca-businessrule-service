@@ -37,6 +37,8 @@ public class DgcConfigProperties {
 
     private final DownloadSetting boosterNotificationRulesDownload = new DownloadSetting();
 
+    private final DownloadSetting cclRulesDownload = new DownloadSetting();
+
     private final DownloadSetting domesticRulesDownload = new DownloadSetting();
 
     private String allowedCorsUrls;
