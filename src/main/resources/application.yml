@@ -75,7 +75,7 @@ dgc:
   allowedCorsUrls: ${DGC_CORS_ENABLED_URL}
   gateway:
     connector:
-      enabled: false
+      enabled: true
       endpoint: ${DGC_GATEWAY_CONNECTOR_ENDPOINT}
       proxy:
         enabled: false
