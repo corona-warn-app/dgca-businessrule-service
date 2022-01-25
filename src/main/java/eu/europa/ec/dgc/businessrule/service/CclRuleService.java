@@ -22,25 +22,27 @@ package eu.europa.ec.dgc.businessrule.service;
 
 import eu.europa.ec.dgc.businessrule.entity.ListType;
 import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
-import eu.europa.ec.dgc.businessrule.model.CCLRuleItem;
+import eu.europa.ec.dgc.businessrule.model.CclRuleItem;
 import eu.europa.ec.dgc.businessrule.repository.SignedListRepository;
-import eu.europa.ec.dgc.businessrule.restapi.dto.CCLRuleListItemDto;
+import eu.europa.ec.dgc.businessrule.restapi.dto.CclRuleListItemDto;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.stream.Collectors;
-
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class CCLRuleService {
+public class CclRuleService {
 
-    private final Map<String, CCLRuleItem> cclRuleMap = new HashMap<>();
+    private final Map<String, CclRuleItem> cclRuleMap = new HashMap<>();
     private final ListSigningService listSigningService;
     private final Optional<SigningService> signingService;
     private final SignedListRepository signedListRepository;
@@ -58,11 +60,11 @@ public class CCLRuleService {
     /**
      * Gets list of all rules ids and hashes.
      */
-    public List<CCLRuleListItemDto> getRulesList() {
+    public List<CclRuleListItemDto> getRulesList() {
 
         return cclRuleMap.values().stream()
-            .sorted(Comparator.comparing(CCLRuleItem::getIdentifier))
-            .map(rule -> new CCLRuleListItemDto(
+            .sorted(Comparator.comparing(CclRuleItem::getIdentifier))
+            .map(rule -> new CclRuleListItemDto(
                 rule.getIdentifier(),
                 rule.getVersion(),
                 rule.getHash()
@@ -78,7 +80,7 @@ public class CCLRuleService {
      * Gets  a rule by hash.
      */
     @Transactional
-    public CCLRuleItem getRuleByHash(String hash) {
+    public CclRuleItem getRuleByHash(String hash) {
         return cclRuleMap.get(hash);
     }
 
@@ -88,10 +90,10 @@ public class CCLRuleService {
      * @param rules list of actual value sets
      */
     @Transactional
-    public void updateRules(List<CCLRuleItem> rules) {
+    public void updateRules(List<CclRuleItem> rules) {
         cclRuleMap.clear();
 
-        for (CCLRuleItem rule : rules) {
+        for (CclRuleItem rule : rules) {
             saveRule(rule);
         }
 
@@ -104,7 +106,7 @@ public class CCLRuleService {
      * @param rule The rule to be saved.
      */
     @Transactional
-    public void saveRule(CCLRuleItem rule) {
+    public void saveRule(CclRuleItem rule) {
         signingService.ifPresent(service -> rule.setSignature(service.computeSignature(rule.getHash())));
         cclRuleMap.put(rule.getHash(), rule);
     }

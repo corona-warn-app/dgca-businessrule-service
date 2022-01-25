@@ -22,10 +22,10 @@ package eu.europa.ec.dgc.businessrule.restapi.controller;
 
 import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
 import eu.europa.ec.dgc.businessrule.exception.DgcaBusinessRulesResponseException;
-import eu.europa.ec.dgc.businessrule.model.CCLRuleItem;
-import eu.europa.ec.dgc.businessrule.restapi.dto.CCLRuleListItemDto;
+import eu.europa.ec.dgc.businessrule.model.CclRuleItem;
+import eu.europa.ec.dgc.businessrule.restapi.dto.CclRuleListItemDto;
 import eu.europa.ec.dgc.businessrule.restapi.dto.ProblemReportDto;
-import eu.europa.ec.dgc.businessrule.service.CCLRuleService;
+import eu.europa.ec.dgc.businessrule.service.CclRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -34,6 +34,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -41,25 +44,24 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
-
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/cclrules")
 @Slf4j
 @ConditionalOnExpression("${dgc.cclRulesDownload.enabled:false} == true")
 @RequiredArgsConstructor
-public class CCLRuleController {
+public class CclRuleController {
 
     private static final String API_VERSION_HEADER = "X-VERSION";
 
     public static final String X_SIGNATURE_HEADER = "X-SIGNATURE";
 
-    private final CCLRuleService cclRuleService;
+    private final CclRuleService cclRuleService;
 
     /**
      * Http Method for getting the rules list.
@@ -85,10 +87,10 @@ public class CCLRuleController {
                 description = "Returns a list of all rule ids and hash values.",
                 content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = CCLRuleListItemDto.class))))
+                    array = @ArraySchema(schema = @Schema(implementation = CclRuleListItemDto.class))))
         }
     )
-    public ResponseEntity<List<CCLRuleListItemDto>> getRules(
+    public ResponseEntity<List<CclRuleListItemDto>> getRules(
         @RequestHeader(value = API_VERSION_HEADER, required = false) String apiVersion
     ) {
         Optional<SignedListEntity> rulesList = cclRuleService.getRulesSignedList();
@@ -179,7 +181,7 @@ public class CCLRuleController {
             throw new DgcaBusinessRulesResponseException(HttpStatus.BAD_REQUEST, "0x005", "Possible reasons: "
                 + "The provided hash value is not correct", hash, "");
         }
-        CCLRuleItem rule =
+        CclRuleItem rule =
             cclRuleService.getRuleByHash(hash);
 
         if (rule == null) {
@@ -189,7 +191,7 @@ public class CCLRuleController {
 
         if (rule.getSignature() != null) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(CCLRuleController.X_SIGNATURE_HEADER, rule.getSignature());
+            responseHeaders.set(CclRuleController.X_SIGNATURE_HEADER, rule.getSignature());
             responseEntity = ResponseEntity.ok().headers(responseHeaders).body(rule.getRawData());
         } else {
             responseEntity = ResponseEntity.ok(rule.getRawData());

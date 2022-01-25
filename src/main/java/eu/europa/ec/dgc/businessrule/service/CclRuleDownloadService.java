@@ -20,11 +20,14 @@
 
 package eu.europa.ec.dgc.businessrule.service;
 
-import eu.europa.ec.dgc.businessrule.exception.BoosterNotificationRuleParseException;
-import eu.europa.ec.dgc.businessrule.exception.CCLRuleParseException;
-import eu.europa.ec.dgc.businessrule.model.BoosterNotificationRuleItem;
-import eu.europa.ec.dgc.businessrule.model.CCLRuleItem;
+import eu.europa.ec.dgc.businessrule.exception.CclRuleParseException;
+import eu.europa.ec.dgc.businessrule.model.CclRuleItem;
 import eu.europa.ec.dgc.businessrule.utils.BusinessRulesUtils;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,11 +38,6 @@ import org.springframework.vault.core.VaultKeyValueOperations;
 import org.springframework.vault.core.VaultKeyValueOperationsSupport;
 import org.springframework.vault.core.VaultTemplate;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -49,7 +47,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Component
 @ConditionalOnProperty("dgc.cclRulesDownload.enabled")
-public class CCLRuleDownloadService {
+public class CclRuleDownloadService {
 
     private final String identifierKeyName = "identifier";
     private final String versionKeyName = "version";
@@ -67,7 +65,7 @@ public class CCLRuleDownloadService {
 
     private final VaultTemplate vaultTemplate;
     private final BusinessRulesUtils businessRulesUtils;
-    private final CCLRuleService cclRuleService;
+    private final CclRuleService cclRuleService;
 
     /**
      * A service to download the ccl rules from a vault key value store.
@@ -75,7 +73,7 @@ public class CCLRuleDownloadService {
     @Scheduled(fixedDelayString = "${dgc.cclRulesDownload.timeInterval}")
     public void downloadRules() {
 
-        List<CCLRuleItem> ruleItems = new ArrayList<>();
+        List<CclRuleItem> ruleItems = new ArrayList<>();
 
         log.info("CCL rules download started");
 
@@ -87,7 +85,7 @@ public class CCLRuleDownloadService {
 
 
         for (String ruleKey : ruleKeys) {
-            CCLRuleItem ruleItem;
+            CclRuleItem ruleItem;
 
             try {
                 ruleItem = getRuleFromVaultData(kv, ruleKey);
@@ -95,7 +93,7 @@ public class CCLRuleDownloadService {
             } catch (NoSuchAlgorithmException e) {
                 log.error("Failed to hash ccl rules on download.", e);
                 return;
-            } catch (CCLRuleParseException e) {
+            } catch (CclRuleParseException e) {
                 log.error("Failed to parse rule with rule key: " + ruleKey);
             }
         }
@@ -111,9 +109,9 @@ public class CCLRuleDownloadService {
         log.info("CCL rules download finished");
     }
 
-    private CCLRuleItem getRuleFromVaultData(VaultKeyValueOperations kv, String ruleKey)
-        throws NoSuchAlgorithmException, CCLRuleParseException {
-        CCLRuleItem ruleItem = new CCLRuleItem();
+    private CclRuleItem getRuleFromVaultData(VaultKeyValueOperations kv, String ruleKey)
+        throws NoSuchAlgorithmException, CclRuleParseException {
+        CclRuleItem ruleItem = new CclRuleItem();
         Map<String, Object> ruleRawData = kv.get(ruleKey).getData();
 
         if (!ruleRawData.keySet().containsAll(expectedKeys)) {
@@ -121,7 +119,7 @@ public class CCLRuleDownloadService {
                 "Not all expected keys value pairs present. Expected: %s , Received: %s",
                 expectedKeys,
                 ruleRawData.keySet()));
-            throw new CCLRuleParseException();
+            throw new CclRuleParseException();
         }
 
         ruleItem.setIdentifier(ruleRawData.get(identifierKeyName).toString());

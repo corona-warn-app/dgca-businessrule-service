@@ -18,24 +18,7 @@
  * ---license-end
  */
 
-package eu.europa.ec.dgc.businessrule.restapi.dto;
+package eu.europa.ec.dgc.businessrule.exception;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Value;
-
-@Schema(
-    name = "CCLRuleListItem",
-    type = "object",
-    example = "{"
-        + "\"identifier\":\"VR-DE-1\","
-        + "\"version\":\"1.0.0\","
-        + "\"hash\":\"6821d518570fe9f4417c482ff0d2582a7b6440f243a9034f812e0d71611b611f\""
-        + "}"
-)
-
-@Value
-public class CCLRuleListItemDto {
-    String identifier;
-    String version;
-    String hash;
+public class CclRuleParseException extends Exception{
 }

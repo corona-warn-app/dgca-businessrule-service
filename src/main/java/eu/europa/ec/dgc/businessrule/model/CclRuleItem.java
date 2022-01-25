@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CCLRuleItem {
+public class CclRuleItem {
 
     private String hash;
 
