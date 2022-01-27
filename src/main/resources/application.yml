@@ -10,8 +10,6 @@ spring:
     password: ''
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog.xml
     database-change-log-table: BR_CHANGELOG
