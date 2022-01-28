@@ -20,12 +20,12 @@
 
 package eu.europa.ec.dgc.businessrule.restapi.controller;
 
-import eu.europa.ec.dgc.businessrule.entity.BusinessRuleEntity;
 import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
 import eu.europa.ec.dgc.businessrule.exception.DgcaBusinessRulesResponseException;
-import eu.europa.ec.dgc.businessrule.restapi.dto.BusinessRuleListItemDto;
+import eu.europa.ec.dgc.businessrule.model.BoosterNotificationRuleItem;
+import eu.europa.ec.dgc.businessrule.restapi.dto.BoosterNotificationRuleListItemDto;
 import eu.europa.ec.dgc.businessrule.restapi.dto.ProblemReportDto;
-import eu.europa.ec.dgc.businessrule.service.BusinessRuleService;
+import eu.europa.ec.dgc.businessrule.service.BoosterNotificationRuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -35,12 +35,11 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,27 +52,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/rules")
+@RequestMapping("/bnrules")
 @Slf4j
+@ConditionalOnExpression("${dgc.boosterNotificationRulesDownload.enabled:false} == true")
 @RequiredArgsConstructor
-public class BusinessRuleController {
+public class BoosterNotificationRuleController {
 
     private static final String API_VERSION_HEADER = "X-VERSION";
 
     public static final String X_SIGNATURE_HEADER = "X-SIGNATURE";
 
-    private final BusinessRuleService businessRuleService;
+    private final BoosterNotificationRuleService boosterNotificationRuleService;
 
     /**
-     * Http Method for getting the business rules list.
+     * Http Method for getting the rules list.
      */
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Gets the a list of all business rule ids country codes and hash values.",
-        description = "This method returns a list containing the ids, country codes and hash values of all business "
-            + "rules. The hash value can be used to check, if a business rule has changed and needs to be updated. "
-            + "The hash value and country code can also be used to download a specific business rule afterwards.",
-        tags = {"Business Rules"},
+        summary = "Gets the a list of all booster notification rule ids and hash values.",
+        description = "This method returns a list containing the ids and hash values of all booster notification "
+            + "rules. The hash value can be used to check, if a rule has changed and needs to be updated. "
+            + "The hash value can also be used to download a specific rule afterwards.",
+        tags = {"Booster Notification Rules"},
         parameters = {
             @Parameter(
                 in = ParameterIn.HEADER,
@@ -85,16 +85,16 @@ public class BusinessRuleController {
         responses = {
             @ApiResponse(
                 responseCode = "200",
-                description = "Returns a list of all business rule ids country codes and hash values.",
+                description = "Returns a list of all rule ids and hash values.",
                 content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = BusinessRuleListItemDto.class))))
+                    array = @ArraySchema(schema = @Schema(implementation = BoosterNotificationRuleListItemDto.class))))
         }
     )
-    public ResponseEntity<List<BusinessRuleListItemDto>> getRules(
+    public ResponseEntity<List<BoosterNotificationRuleListItemDto>> getRules(
         @RequestHeader(value = API_VERSION_HEADER, required = false) String apiVersion
     ) {
-        Optional<SignedListEntity> rulesList = businessRuleService.getBusinessRulesSignedList();
+        Optional<SignedListEntity> rulesList = boosterNotificationRuleService.getRulesSignedList();
         ResponseEntity responseEntity;
         if (rulesList.isPresent()) {
             ResponseEntity.BodyBuilder respBuilder = ResponseEntity.ok();
@@ -106,77 +106,26 @@ public class BusinessRuleController {
             }
             responseEntity = respBuilder.body(rulesList.get().getRawData());
         } else {
-            responseEntity = ResponseEntity.ok(businessRuleService.getBusinessRulesList());
+            responseEntity = ResponseEntity.ok(boosterNotificationRuleService.getRulesList());
         }
         return responseEntity;
     }
 
 
     /**
-     * Http Method for getting the business rules list for a country.
+     * Http Method for getting  specific rule set .
      */
-    @GetMapping(path = "/{country}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{hash}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Gets the a list of all business rule ids country codes and hash values for a country.",
-        description = "This method returns a list containing the ids, country codes and hash values of all business "
-            + "rules for a country. The hash value can be used to check, if a business rule has changed and needs to "
-            + "be updated. The hash value and country code can also be used to download a specific business "
-            + "rule afterwards.",
-        tags = {"Business Rules"},
+        summary = "Gets a specific rule by its  hash value.",
+        description = "This method can be used to download a specific rule. Therefore the hash value "
+            + "of the rule must be provided as path parameter.",
+        tags = {"Booster Notification Rules"},
         parameters = {
-            @Parameter(
-                in = ParameterIn.HEADER,
-                name = "X-VERSION",
-                description = "Version of the API. In preparation of changes in the future. Set it to \"1.0\"",
-                required = true,
-                schema = @Schema(implementation = String.class))
-        },
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Returns a list of all business rule ids country codes and hash values for a country.",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = BusinessRuleListItemDto.class)))),
-            @ApiResponse(
-                responseCode = "400",
-                description = "The Country Code has a wrong format.",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ProblemReportDto.class)))
-        }
-    )
-    public ResponseEntity<List<BusinessRuleListItemDto>> getRulesForCountry(
-        @RequestHeader(value = API_VERSION_HEADER, required = false) String apiVersion,
-        @Valid @PathVariable("country") String country
-    ) {
-
-        validateCountryParameter(country);
-
-        return ResponseEntity.ok(businessRuleService.getBusinessRulesListForCountry(country.toUpperCase(Locale.ROOT)));
-    }
-
-
-    /**
-     * Http Method for getting  specific business rule set .
-     */
-    @GetMapping(path = "/{country}/{hash}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(
-        summary = "Gets a specific business rule by its country code and hash value.",
-        description = "This method can be used to download a specific business rule. Therefore the hash value and the "
-            + "country code of the rule must be provided as path parameter.",
-        tags = {"Business Rules"},
-        parameters = {
-            @Parameter(
-                in = ParameterIn.PATH,
-                name = "country",
-                description = "Country code of the business rule to download.",
-                required = true,
-                schema = @Schema(implementation = String.class)),
             @Parameter(
                 in = ParameterIn.PATH,
                 name = "hash",
-                description = "Hash of the business rule to download.",
+                description = "Hash of the rule to download.",
                 required = true,
                 schema = @Schema(implementation = String.class)),
             @Parameter(
@@ -189,7 +138,7 @@ public class BusinessRuleController {
         responses = {
             @ApiResponse(
                 responseCode = "200",
-                description = "Returns the specified business rule.",
+                description = "Returns the specified rule.",
                 content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = String.class),
@@ -217,42 +166,33 @@ public class BusinessRuleController {
                             + "}")
                     })),
             @ApiResponse(
-                responseCode = "400",
-                description = "The Country Code has a wrong format.",
-                content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ProblemReportDto.class))),
-            @ApiResponse(
                 responseCode = "404",
-                description = "Business rule could not be found for the given hash and country code value.",
+                description = "Rule could not be found for the given hash value.",
                 content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = ProblemReportDto.class)))
         })
-    public ResponseEntity<String> getRuleByCountryAndHash(
+    public ResponseEntity<String> getRuleByHash(
         @RequestHeader(value = API_VERSION_HEADER, required = false) String apiVersion,
-        @Valid @PathVariable("country") String country,
         @Valid @PathVariable("hash") String hash
     ) {
         ResponseEntity<String> responseEntity;
 
-        validateCountryParameter(country);
-
         if (hash == null || hash.isBlank()) {
             throw new DgcaBusinessRulesResponseException(HttpStatus.BAD_REQUEST, "0x005", "Possible reasons: "
-                + "The provided hash value is not correct", hash,"");
+                + "The provided hash value is not correct", hash, "");
         }
-        BusinessRuleEntity rule =
-            businessRuleService.getBusinessRuleByCountryAndHash(country.toUpperCase(Locale.ROOT), hash);
+        BoosterNotificationRuleItem rule =
+            boosterNotificationRuleService.getRuleByHash(hash);
 
         if (rule == null) {
             throw new DgcaBusinessRulesResponseException(HttpStatus.NOT_FOUND, "0x006", "Possible reasons: "
-                + "The provided hash or country may not be correct.", "country: " + country + ", hash: " + hash,"");
+                + "The provided hash may not be correct.", "hash: " + hash, "");
         }
 
         if (rule.getSignature() != null) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set(BusinessRuleController.X_SIGNATURE_HEADER, rule.getSignature());
+            responseHeaders.set(BoosterNotificationRuleController.X_SIGNATURE_HEADER, rule.getSignature());
             responseEntity = ResponseEntity.ok().headers(responseHeaders).body(rule.getRawData());
         } else {
             responseEntity = ResponseEntity.ok(rule.getRawData());
@@ -261,11 +201,5 @@ public class BusinessRuleController {
         return responseEntity;
     }
 
-    private void validateCountryParameter(String country) throws DgcaBusinessRulesResponseException {
-        if (!country.matches("^[a-zA-Z]{2}$")) {
-            throw new DgcaBusinessRulesResponseException(HttpStatus.BAD_REQUEST, "0x004", "Possible reasons: "
-                    + "The Country Code has a wrong format. Should be 2 char format.", country,"");
-        }
-    }
 
 }

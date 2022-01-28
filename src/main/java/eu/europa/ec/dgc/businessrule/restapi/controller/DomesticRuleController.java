@@ -2,7 +2,7 @@
  * ---license-start
  * eu-digital-green-certificates / dgca-businessrule-service
  * ---
- * Copyright (C) 2021 T-Systems International GmbH and all other contributors
+ * Copyright (C) 2022 T-Systems International GmbH and all other contributors
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,9 +52,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/bnrules")
+@RequestMapping("/domesticrules")
 @Slf4j
-@ConditionalOnExpression("${dgc.domestic-mode.enabled:false} == true")
+@ConditionalOnExpression("${dgc.domesticRulesDownload.enabled:false} == true")
 @RequiredArgsConstructor
 public class DomesticRuleController {
 
@@ -69,8 +69,8 @@ public class DomesticRuleController {
      */
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
-        summary = "Gets the a list of all booster notification rule ids and hash values.",
-        description = "This method returns a list containing the ids and hash values of all booster notification "
+        summary = "Gets the a list of all domestic rule ids and hash values.",
+        description = "This method returns a list containing the ids and hash values of all domestic "
             + "rules. The hash value can be used to check, if a rule has changed and needs to be updated. "
             + "The hash value can also be used to download a specific rule afterwards.",
         tags = {"Booster Notification Rules"},

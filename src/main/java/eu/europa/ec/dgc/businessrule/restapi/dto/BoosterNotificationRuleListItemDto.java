@@ -18,23 +18,24 @@
  * ---license-end
  */
 
-package eu.europa.ec.dgc.businessrule.service;
+package eu.europa.ec.dgc.businessrule.restapi.dto;
 
-public interface DataDownloadService {
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Value;
 
-    /**
-     * Synchronises the business rules with the gateway.
-     */
-    void downloadRules();
+@Schema(
+    name = "BoosterNotificationRuleListItem",
+    type = "object",
+    example = "{"
+        + "\"identifier\":\"VR-DE-1\","
+        + "\"version\":\"1.0.0\","
+        + "\"hash\":\"6821d518570fe9f4417c482ff0d2582a7b6440f243a9034f812e0d71611b611f\""
+        + "}"
+)
 
-    /**
-     * Synchronises the value sets with the gateway.
-     */
-    void downloadValueSets();
-
-    /**
-     * Synchronises the country list with the gateway.
-     */
-    void downloadCountryList();
-
+@Value
+public class BoosterNotificationRuleListItemDto {
+    String identifier;
+    String version;
+    String hash;
 }

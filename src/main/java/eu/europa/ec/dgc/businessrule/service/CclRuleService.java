@@ -22,9 +22,9 @@ package eu.europa.ec.dgc.businessrule.service;
 
 import eu.europa.ec.dgc.businessrule.entity.ListType;
 import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
-import eu.europa.ec.dgc.businessrule.model.DomesticRuleItem;
+import eu.europa.ec.dgc.businessrule.model.CclRuleItem;
 import eu.europa.ec.dgc.businessrule.repository.SignedListRepository;
-import eu.europa.ec.dgc.businessrule.restapi.dto.DomesticRuleListItemDto;
+import eu.europa.ec.dgc.businessrule.restapi.dto.CclRuleListItemDto;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +37,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class DomesticRuleService {
+public class CclRuleService {
 
-    private final Map<String, DomesticRuleItem> domesticRuleMap = new HashMap<>();
+    private final Map<String, CclRuleItem> cclRuleMap = new HashMap<>();
     private final ListSigningService listSigningService;
     private final Optional<SigningService> signingService;
     private final SignedListRepository signedListRepository;
@@ -53,19 +52,19 @@ public class DomesticRuleService {
      */
     @PostConstruct
     @Transactional
-    public void domesticRuleServiceInit() {
-        listSigningService.updateSignedList(getRulesList(), ListType.DomesticRules);
+    public void boosterNotificationRuleServiceInit() {
+        listSigningService.updateSignedList(getRulesList(), ListType.CCLRules);
     }
 
 
     /**
      * Gets list of all rules ids and hashes.
      */
-    public List<DomesticRuleListItemDto> getRulesList() {
+    public List<CclRuleListItemDto> getRulesList() {
 
-        return domesticRuleMap.values().stream()
-            .sorted(Comparator.comparing(DomesticRuleItem::getIdentifier))
-            .map(rule -> new DomesticRuleListItemDto(
+        return cclRuleMap.values().stream()
+            .sorted(Comparator.comparing(CclRuleItem::getIdentifier))
+            .map(rule -> new CclRuleListItemDto(
                 rule.getIdentifier(),
                 rule.getVersion(),
                 rule.getHash()
@@ -73,7 +72,7 @@ public class DomesticRuleService {
     }
 
     public Optional<SignedListEntity> getRulesSignedList() {
-        return signedListRepository.findById(ListType.DomesticRules);
+        return signedListRepository.findById(ListType.CCLRules);
     }
 
 
@@ -81,8 +80,8 @@ public class DomesticRuleService {
      * Gets  a rule by hash.
      */
     @Transactional
-    public DomesticRuleItem getRuleByHash(String hash) {
-        return domesticRuleMap.get(hash);
+    public CclRuleItem getRuleByHash(String hash) {
+        return cclRuleMap.get(hash);
     }
 
     /**
@@ -91,14 +90,14 @@ public class DomesticRuleService {
      * @param rules list of actual value sets
      */
     @Transactional
-    public void updateRules(List<DomesticRuleItem> rules) {
-        domesticRuleMap.clear();
+    public void updateRules(List<CclRuleItem> rules) {
+        cclRuleMap.clear();
 
-        for (DomesticRuleItem rule : rules) {
+        for (CclRuleItem rule : rules) {
             saveRule(rule);
         }
 
-        listSigningService.updateSignedList(getRulesList(), ListType.DomesticRules);
+        listSigningService.updateSignedList(getRulesList(), ListType.CCLRules);
     }
 
     /**
@@ -107,9 +106,9 @@ public class DomesticRuleService {
      * @param rule The rule to be saved.
      */
     @Transactional
-    public void saveRule(DomesticRuleItem rule) {
+    public void saveRule(CclRuleItem rule) {
         signingService.ifPresent(service -> rule.setSignature(service.computeSignature(rule.getHash())));
-        domesticRuleMap.put(rule.getHash(), rule);
+        cclRuleMap.put(rule.getHash(), rule);
     }
 
 }

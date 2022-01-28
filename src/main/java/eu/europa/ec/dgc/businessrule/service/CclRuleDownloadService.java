@@ -20,8 +20,8 @@
 
 package eu.europa.ec.dgc.businessrule.service;
 
-import eu.europa.ec.dgc.businessrule.exception.DomesticRuleParseException;
-import eu.europa.ec.dgc.businessrule.model.DomesticRuleItem;
+import eu.europa.ec.dgc.businessrule.exception.CclRuleParseException;
+import eu.europa.ec.dgc.businessrule.model.CclRuleItem;
 import eu.europa.ec.dgc.businessrule.utils.BusinessRulesUtils;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -39,14 +39,15 @@ import org.springframework.vault.core.VaultKeyValueOperationsSupport;
 import org.springframework.vault.core.VaultTemplate;
 
 
+
 /**
- * A service to download the bnrules from the vault.
+ * A service to download the cclrules from the vault.
  */
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@ConditionalOnProperty("dgc.domesticRulesDownload.enabled")
-public class DomesticRuleDownloadService {
+@ConditionalOnProperty("dgc.cclRulesDownload.enabled")
+public class CclRuleDownloadService {
 
     private final String identifierKeyName = "identifier";
     private final String versionKeyName = "version";
@@ -56,25 +57,25 @@ public class DomesticRuleDownloadService {
         versionKeyName,
         rawDataKeyName);
 
-    @Value("${dgc.domesticRulesDownload.key-store}")
+    @Value("${dgc.cclRulesDownload.key-store}")
     private String keyStoreName;
 
-    @Value("${dgc.domesticRulesDownload.base-path}")
+    @Value("${dgc.cclRulesDownload.base-path}")
     private String rulesBasePath;
 
     private final VaultTemplate vaultTemplate;
     private final BusinessRulesUtils businessRulesUtils;
-    private final DomesticRuleService domesticRuleService;
+    private final CclRuleService cclRuleService;
 
     /**
-     * A service to download the domestic rules from a vault key value store.
+     * A service to download the ccl rules from a vault key value store.
      */
-    @Scheduled(fixedDelayString = "${dgc.domesticRulesDownload.timeInterval}")
+    @Scheduled(fixedDelayString = "${dgc.cclRulesDownload.timeInterval}")
     public void downloadRules() {
 
-        List<DomesticRuleItem> ruleItems = new ArrayList<>();
+        List<CclRuleItem> ruleItems = new ArrayList<>();
 
-        log.info("Domestic rules download started");
+        log.info("CCL rules download started");
 
         VaultKeyValueOperations kv = vaultTemplate.opsForKeyValue(
             keyStoreName,
@@ -84,33 +85,33 @@ public class DomesticRuleDownloadService {
 
 
         for (String ruleKey : ruleKeys) {
-            DomesticRuleItem ruleItem;
+            CclRuleItem ruleItem;
 
             try {
                 ruleItem = getRuleFromVaultData(kv, ruleKey);
                 ruleItems.add(ruleItem);
             } catch (NoSuchAlgorithmException e) {
-                log.error("Failed to hash domestic rules on download.", e);
+                log.error("Failed to hash ccl rules on download.", e);
                 return;
-            } catch (DomesticRuleParseException e) {
+            } catch (CclRuleParseException e) {
                 log.error("Failed to parse rule with rule key: " + ruleKey);
             }
         }
 
         if (!ruleItems.isEmpty()) {
-            domesticRuleService.updateRules(ruleItems);
+            cclRuleService.updateRules(ruleItems);
         } else {
-            log.warn("The download of the domestic rules seems to fail, as the download connector "
+            log.warn("The download of the CCL rules seems to fail, as the download connector "
                 + "returns an empty rules list.-> No data was changed.");
         }
 
 
-        log.info("Domestic rules download finished");
+        log.info("CCL rules download finished");
     }
 
-    private DomesticRuleItem getRuleFromVaultData(VaultKeyValueOperations kv, String ruleKey)
-        throws NoSuchAlgorithmException, DomesticRuleParseException {
-        DomesticRuleItem ruleItem = new DomesticRuleItem();
+    private CclRuleItem getRuleFromVaultData(VaultKeyValueOperations kv, String ruleKey)
+        throws NoSuchAlgorithmException, CclRuleParseException {
+        CclRuleItem ruleItem = new CclRuleItem();
         Map<String, Object> ruleRawData = kv.get(ruleKey).getData();
 
         if (!ruleRawData.keySet().containsAll(expectedKeys)) {
@@ -118,7 +119,7 @@ public class DomesticRuleDownloadService {
                 "Not all expected keys value pairs present. Expected: %s , Received: %s",
                 expectedKeys,
                 ruleRawData.keySet()));
-            throw new DomesticRuleParseException();
+            throw new CclRuleParseException();
         }
 
         ruleItem.setIdentifier(ruleRawData.get(identifierKeyName).toString());

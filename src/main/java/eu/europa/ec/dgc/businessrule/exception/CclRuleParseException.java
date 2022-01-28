@@ -18,23 +18,7 @@
  * ---license-end
  */
 
-package eu.europa.ec.dgc.businessrule.service;
+package eu.europa.ec.dgc.businessrule.exception;
 
-public interface DataDownloadService {
-
-    /**
-     * Synchronises the business rules with the gateway.
-     */
-    void downloadRules();
-
-    /**
-     * Synchronises the value sets with the gateway.
-     */
-    void downloadValueSets();
-
-    /**
-     * Synchronises the country list with the gateway.
-     */
-    void downloadCountryList();
-
+public class CclRuleParseException extends Exception{
 }

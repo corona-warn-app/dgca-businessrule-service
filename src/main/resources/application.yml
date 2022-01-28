@@ -10,8 +10,6 @@ spring:
     password: ''
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: validate
   liquibase:
     change-log: classpath:db/changelog.xml
     database-change-log-table: BR_CHANGELOG
@@ -70,9 +68,6 @@ dgc:
     timeInterval: 1800000
     lockLimit: 3600000
   countryListDownload:
-    timeInterval: 1800000
-    lockLimit: 3600000
-  domesticRulesDownload:
     timeInterval: 1800000
     lockLimit: 3600000
   allowedCorsUrls: ${DGC_CORS_ENABLED_URL}
