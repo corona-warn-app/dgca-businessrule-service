@@ -24,20 +24,22 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
-    <owasp.version>6.5.3</owasp.version>
-    <spring.boot.version>2.6.2</spring.boot.version>
-    <spring.cloud.version>2021.0.0</spring.cloud.version>
+    <owasp.version>7.0.0</owasp.version>
+    <spring.boot.version>2.6.4</spring.boot.version>
+    <spring.cloud.version>2021.0.1</spring.cloud.version>
     <spring.test.version>5.3.12</spring.test.version>
-    <spring.security.version>5.6.0</spring.security.version>
     <lombok.version>1.18.22</lombok.version>
     <liquibase.version>4.6.2</liquibase.version>
-    <springdoc.version>1.6.0</springdoc.version>
+    <springdoc.version>1.6.6</springdoc.version>
     <junit.version>5.8.2</junit.version>
     <mapstruct.version>1.4.2.Final</mapstruct.version>
     <mockito.version>4.1.0</mockito.version>
     <bcpkix.version>1.70</bcpkix.version>
     <okhttp.version>4.9.2</okhttp.version>
-    <shedlock.version>4.30.0</shedlock.version>
+    <shedlock.version>4.33.0</shedlock.version>
+    <h2.version>2.1.210</h2.version>
+    <tomcat.version>9.0.58</tomcat.version>
+    <psql.version>42.3.3</psql.version>
     <dgc.lib.version>1.1.9</dgc.lib.version>
     <slf4j.version>1.7.32</slf4j.version>
     <!-- plugins -->
@@ -135,6 +137,7 @@
   </dependencyManagement>
 
   <dependencies>
+
     <dependency>
       <groupId>eu.europa.ec.dgc</groupId>
       <artifactId>dgc-lib</artifactId>
@@ -216,11 +219,13 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+       <version>${h2.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+       <version>${psql.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -233,11 +238,6 @@
       <artifactId>mockito-core</artifactId>
       <version>${mockito.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-web</artifactId>
-      <version>${spring.security.version}</version>
     </dependency>
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
