@@ -43,6 +43,17 @@ public class DgcConfigProperties {
 
     private String allowedCorsUrls;
 
+    private UserAgentLogging userAgentLogging = new UserAgentLogging();
+
+    @Getter
+    @Setter
+    public static class UserAgentLogging {
+        private Integer interval;
+        private Integer cleanupInterval;
+        private Integer maxAge;
+        private String encryptionPublicKey;
+    }
+
     @Getter
     @Setter
     public static class DownloadSetting {
