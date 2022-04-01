@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty("dgc.userAgentLogging.interval")
+@ConditionalOnProperty("dgc.userAgentLogging.enabled")
 public class UserAgentLogService {
 
     private static final String ENCRYPTION_ALGORITHM = "RSA";
@@ -151,7 +151,9 @@ public class UserAgentLogService {
     }
 
     private boolean isUserAgentLoggingEnabled() {
-        return dgcConfigProperties.getUserAgentLogging().getInterval() != null
+        return dgcConfigProperties.getUserAgentLogging().getEnabled() != null
+            && dgcConfigProperties.getUserAgentLogging().getEnabled()
+            && dgcConfigProperties.getUserAgentLogging().getInterval() != null
             && dgcConfigProperties.getUserAgentLogging().getInterval() != -1
             && dgcConfigProperties.getUserAgentLogging().getEncryptionPublicKey() != null
             && !dgcConfigProperties.getUserAgentLogging().getEncryptionPublicKey().isEmpty();

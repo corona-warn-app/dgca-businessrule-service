@@ -19,7 +19,8 @@ server:
     key-store-password: ${SERVER_SSL_KEYSTOREPASSWORD}
 dgc:
   userAgentLogging:
-    interval: ${CWA_USERAGENTLOGGING_INTERVAL:false}
+    enabled: ${CWA_USERAGENTLOGGING_ENABLED:false}
+    interval: ${CWA_USERAGENTLOGGING_INTERVAL:}
     encryptionPublicKey: ${CWA_USERAGENTLOGGING_ENCRYPTIONPUBLICKEY:}
     cleanupInterval: ${CWA_USERAGENTLOGGING_CLEANUPINTERVAL:86400}
     maxAge: ${CWA_USERAGENTLOGGING_MAXAGE:7}

@@ -48,6 +48,7 @@ public class DgcConfigProperties {
     @Getter
     @Setter
     public static class UserAgentLogging {
+        private Boolean enabled;
         private Integer interval;
         private Integer cleanupInterval;
         private Integer maxAge;
