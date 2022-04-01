@@ -118,7 +118,7 @@ public class UserAgentLogService {
                 return;
             }
 
-            persistenceService.increaseCount(timestamp, encryptedUserAgent, encryptedRequestString);
+            persistenceService.increaseCount(timestamp, encryptedUserAgent, encryptedRequestString, count);
         });
     }
 

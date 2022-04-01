@@ -46,7 +46,7 @@ public class UserAgentLogPersistenceService {
      * @param requestString String describing the performed request (should be encrypted)
      */
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
-    public void increaseCount(ZonedDateTime timestamp, String userAgent, String requestString) {
+    public void increaseCount(ZonedDateTime timestamp, String userAgent, String requestString, Long amount) {
         Optional<UserAgentLogEntity> existingEntityOptional =
             userAgentLogRepository.getFirstByTimestampAndUserAgentAndAndRequestString(
                 timestamp, userAgent, requestString);
@@ -54,12 +54,12 @@ public class UserAgentLogPersistenceService {
         if (existingEntityOptional.isPresent()) {
             log.debug("Entity for K/V Pair already exists, increasing count.");
             UserAgentLogEntity existingEntity = existingEntityOptional.get();
-            existingEntity.setCount(existingEntity.getCount() + 1);
+            existingEntity.setCount(existingEntity.getCount() + amount);
             userAgentLogRepository.save(existingEntity);
         } else {
             log.debug("Entity for K/V Pair does not exist, creating new one.");
             userAgentLogRepository.save(
-                new UserAgentLogEntity(null, timestamp, userAgent, requestString, 1L));
+                new UserAgentLogEntity(null, timestamp, userAgent, requestString, amount));
         }
     }
 
