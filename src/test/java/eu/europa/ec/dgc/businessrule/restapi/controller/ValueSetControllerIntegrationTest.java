@@ -20,13 +20,13 @@
 
 package eu.europa.ec.dgc.businessrule.restapi.controller;
 
-import eu.europa.ec.dgc.businessrule.entity.ListType;
-import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import eu.europa.ec.dgc.businessrule.repository.SignedListRepository;
 import eu.europa.ec.dgc.businessrule.repository.ValueSetRepository;
-import eu.europa.ec.dgc.businessrule.service.BusinessRuleService;
 import eu.europa.ec.dgc.businessrule.service.ListSigningService;
-import eu.europa.ec.dgc.businessrule.service.SigningService;
 import eu.europa.ec.dgc.businessrule.service.ValueSetService;
 import eu.europa.ec.dgc.businessrule.testdata.BusinessRulesTestHelper;
 import eu.europa.ec.dgc.gateway.connector.DgcGatewayCountryListDownloadConnector;
@@ -41,9 +41,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
