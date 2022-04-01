@@ -21,10 +21,10 @@
 package eu.europa.ec.dgc.businessrule.restapi.interceptor;
 
 import eu.europa.ec.dgc.businessrule.service.UserAgentLogService;
-import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -33,7 +33,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 public class UserAgentLogInterceptor implements HandlerInterceptor {
 
-    private final Optional<UserAgentLogService> optionalUserAgentLogService;
+    private final ObjectProvider<UserAgentLogService> optionalUserAgentLogService;
 
     /**
      * Interceptor to log UserAgents of completed requests.
@@ -45,7 +45,7 @@ public class UserAgentLogInterceptor implements HandlerInterceptor {
         String userAgentHeader = request.getHeader(HttpHeaders.USER_AGENT);
         String userAgent = userAgentHeader == null ? "NO USER AGENT" : userAgentHeader;
 
-        optionalUserAgentLogService.ifPresent(service -> service.registerUserAgent(
+        optionalUserAgentLogService.ifAvailable(service -> service.registerUserAgent(
             request.getMethod() + " " + request.getRequestURI(), userAgent));
     }
 }
