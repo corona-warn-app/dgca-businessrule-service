@@ -25,12 +25,12 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
     <owasp.version>6.5.3</owasp.version>
-    <spring.boot.version>2.6.2</spring.boot.version>
+    <spring.boot.version>2.6.6</spring.boot.version>
     <spring.cloud.version>2021.0.0</spring.cloud.version>
     <spring.test.version>5.3.12</spring.test.version>
-    <spring.security.version>5.6.0</spring.security.version>
+    <spring.security.version>5.6.2</spring.security.version>
     <lombok.version>1.18.22</lombok.version>
-    <liquibase.version>4.6.2</liquibase.version>
+    <liquibase.version>4.9.1</liquibase.version>
     <springdoc.version>1.6.0</springdoc.version>
     <junit.version>5.8.2</junit.version>
     <mapstruct.version>1.4.2.Final</mapstruct.version>
@@ -38,8 +38,9 @@
     <bcpkix.version>1.70</bcpkix.version>
     <okhttp.version>4.9.2</okhttp.version>
     <shedlock.version>4.30.0</shedlock.version>
-    <dgc.lib.version>1.1.9</dgc.lib.version>
+    <dgc.lib.version>1.3.1</dgc.lib.version>
     <slf4j.version>1.7.32</slf4j.version>
+    <h2.version>2.1.210</h2.version>
     <!-- plugins -->
     <plugin.checkstyle.version>3.1.2</plugin.checkstyle.version>
     <plugin.sonar.version>3.9.0.2155</plugin.sonar.version>
@@ -217,6 +218,7 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>runtime</scope>
+      <version>${h2.version}</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
