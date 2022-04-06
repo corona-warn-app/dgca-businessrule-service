@@ -220,7 +220,6 @@
       <artifactId>h2</artifactId>
       <version>${h2.version}</version>
       <scope>runtime</scope>
-      <version>${h2.version}</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>
