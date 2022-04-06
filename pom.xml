@@ -25,7 +25,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!-- dependencies -->
     <owasp.version>7.0.0</owasp.version>
-    <spring.boot.version>2.6.4</spring.boot.version>
+    <spring.boot.version>2.6.6</spring.boot.version>
     <spring.cloud.version>2021.0.1</spring.cloud.version>
     <spring.test.version>5.3.12</spring.test.version>
     <lombok.version>1.18.22</lombok.version>
