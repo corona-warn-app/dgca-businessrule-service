@@ -68,6 +68,7 @@ public class UserAgentLogPersistenceService {
      * @param threshold Threshold timestamp
      * @return Number of deleted entities
      */
+    @Transactional
     public int cleanup(ZonedDateTime threshold) {
         return userAgentLogRepository.cleanup(threshold);
     }
