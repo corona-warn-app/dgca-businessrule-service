@@ -33,6 +33,10 @@ public interface UserAgentLogRepository extends JpaRepository<UserAgentLogEntity
     Optional<UserAgentLogEntity> getFirstByTimestampAndUserAgentAndAndRequestString(
         ZonedDateTime timestamp, String userAgent, String requestString);
 
+    @Query("UPDATE UserAgentLogEntity e SET e.count = :count WHERE e.id = :id")
+    @Modifying
+    int updateCount(@Param("id") Long id, @Param("count") Long count);
+
     @Query("DELETE FROM UserAgentLogEntity e WHERE e.timestamp < :threshold")
     @Modifying
     int cleanup(@Param("threshold") ZonedDateTime threshold);
