@@ -26,6 +26,8 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,10 +48,11 @@ public class UserAgentLogPersistenceService {
      * @param requestString String describing the performed request (should be encrypted)
      */
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRES_NEW)
+    @Retryable(value = RuntimeException.class, maxAttempts = 10,
+        backoff = @Backoff(delay = 150, maxDelay = 5000, random = true))
     public void increaseCount(ZonedDateTime timestamp, String userAgent, String requestString, Long amount) {
-        Optional<UserAgentLogEntity> existingEntityOptional =
-            userAgentLogRepository.getFirstByTimestampAndUserAgentAndAndRequestString(
-                timestamp, userAgent, requestString);
+        Optional<UserAgentLogEntity> existingEntityOptional = userAgentLogRepository
+            .getFirstByTimestampAndUserAgentAndAndRequestString(timestamp, userAgent, requestString);
 
         if (existingEntityOptional.isPresent()) {
             log.debug("Entity for K/V Pair already exists, increasing count.");
@@ -57,8 +60,7 @@ public class UserAgentLogPersistenceService {
             userAgentLogRepository.updateCount(existingEntity.getId(), existingEntity.getCount() + amount);
         } else {
             log.debug("Entity for K/V Pair does not exist, creating new one.");
-            userAgentLogRepository.save(
-                new UserAgentLogEntity(null, timestamp, userAgent, requestString, amount));
+            userAgentLogRepository.save(new UserAgentLogEntity(null, timestamp, userAgent, requestString, amount));
         }
     }
 
@@ -69,6 +71,7 @@ public class UserAgentLogPersistenceService {
      * @return Number of deleted entities
      */
     @Transactional
+    @Retryable(value = RuntimeException.class, maxAttempts = 10, backoff = @Backoff(delay = 2000, maxDelay = 10000))
     public int cleanup(ZonedDateTime threshold) {
         return userAgentLogRepository.cleanup(threshold);
     }

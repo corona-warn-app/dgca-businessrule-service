@@ -27,6 +27,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.retry.annotation.EnableRetry;
 
 /**
  * The Application class.
@@ -34,6 +35,7 @@ import org.springframework.cache.annotation.EnableCaching;
 @SpringBootApplication
 @EnableCaching
 @EnableConfigurationProperties({DgcConfigProperties.class, JksSigningConfig.class})
+@EnableRetry
 public class DgcBusinessRuleServiceApplication extends SpringBootServletInitializer {
 
     /**
