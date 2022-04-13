@@ -54,8 +54,7 @@ public class UserAgentLogPersistenceService {
         if (existingEntityOptional.isPresent()) {
             log.debug("Entity for K/V Pair already exists, increasing count.");
             UserAgentLogEntity existingEntity = existingEntityOptional.get();
-            existingEntity.setCount(existingEntity.getCount() + amount);
-            userAgentLogRepository.save(existingEntity);
+            userAgentLogRepository.updateCount(existingEntity.getId(), existingEntity.getCount() + amount);
         } else {
             log.debug("Entity for K/V Pair does not exist, creating new one.");
             userAgentLogRepository.save(
@@ -69,6 +68,7 @@ public class UserAgentLogPersistenceService {
      * @param threshold Threshold timestamp
      * @return Number of deleted entities
      */
+    @Transactional
     public int cleanup(ZonedDateTime threshold) {
         return userAgentLogRepository.cleanup(threshold);
     }
