@@ -53,7 +53,7 @@ jobs:
         docker build . \
         --file ./Dockerfile \
         --tag "${APP_PACKAGES_URL}:${APP_VERSION}" \
-        --tag "${TRUSTED_URL}/${TRUSTED_REPOSITORY}/cwa-dcc-rules:${APP_VERSION}"
+        --tag "${TRUSTED_URL}/${TRUSTED_REPOSITORY}/cwa-dcc-rules:${APP_VERSION}" \
         --tag ${MTR_REPOSITORY}/cwa-dcc-rules:${VERSION}
         docker push "${APP_PACKAGES_URL}:${APP_VERSION}"
       env:
