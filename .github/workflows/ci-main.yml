@@ -77,8 +77,8 @@ jobs:
     - name: docker push new mtr
       run: |
         echo ${MTR_TOKEN} | docker login ${MTR_REPOSITORY} -u ${MTR_USER} --password-stdin
-        docker push ${MTR_REPOSITORY}/cwa-dcc-rules:${VERSION}
-        cosign sign --key env://MTR_PRIVATE_KEY ${MTR_REPOSITORY}/cwa-dcc-rules:${VERSION}
+        docker push ${MTR_REPOSITORY}/cwa-dcc-rules:${APP_VERSION}
+        cosign sign --key env://MTR_PRIVATE_KEY ${MTR_REPOSITORY}/cwa-dcc-rules:${APP_VERSION}
       env:
         MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
         MTR_USER: ${{ secrets.MTR_USER }}
