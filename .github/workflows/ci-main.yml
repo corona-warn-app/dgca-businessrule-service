@@ -34,6 +34,8 @@ jobs:
         --file ./pom.xml \
         --settings ./settings.xml \
         --define newVersion="${APP_VERSION}"
+        --define app.packages.username="${APP_PACKAGES_USERNAME}" \
+        --define app.packages.password="${APP_PACKAGES_PASSWORD}"
         mvn clean verify \
         --batch-mode \
         --file ./pom.xml \
