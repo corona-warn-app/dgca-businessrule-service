@@ -8,6 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
+    - uses: sigstore/cosign-installer@main
     - uses: actions/setup-java@v2
       with:
         java-version: 11
@@ -51,6 +52,7 @@ jobs:
         --file ./Dockerfile \
         --tag "${APP_PACKAGES_URL}:${APP_VERSION}" \
         --tag "${TRUSTED_URL}/${TRUSTED_REPOSITORY}/cwa-dcc-rules:${APP_VERSION}"
+        --tag ${MTR_REPOSITORY}/cwa-dcc-rules:${VERSION}
         docker push "${APP_PACKAGES_URL}:${APP_VERSION}"
       env:
         APP_PACKAGES_URL: docker.pkg.github.com/${{ github.repository }}/dgca-businessrule-service
@@ -58,6 +60,7 @@ jobs:
         APP_PACKAGES_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         TRUSTED_URL: ${{ secrets.TRUSTED_URL }}
         TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
+        MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
     - name: docker push trusted
       run: |
         echo ${TRUSTED_TOKEN} | docker login ${TRUSTED_URL} -u ${TRUSTED_USER} --password-stdin
@@ -69,3 +72,14 @@ jobs:
         TRUSTED_REPOSITORY: ${{ secrets.TRUSTED_REPOSITORY }}
         TRUSTED_USER: ${{ secrets.TRUSTED_USER }}
         TRUSTED_TOKEN: ${{ secrets.TRUSTED_TOKEN }}
+    - name: docker push new mtr
+      run: |
+        echo ${MTR_TOKEN} | docker login ${MTR_REPOSITORY} -u ${MTR_USER} --password-stdin
+        docker push ${MTR_REPOSITORY}/cwa-dcc-rules:${VERSION}
+        cosign sign --key env://MTR_PRIVATE_KEY ${MTR_REPOSITORY}/cwa-dcc-rules:${VERSION}
+      env:
+        MTR_REPOSITORY: ${{ secrets.MTR_REPOSITORY }}
+        MTR_USER: ${{ secrets.MTR_USER }}
+        MTR_TOKEN: ${{ secrets.MTR_TOKEN }}
+        MTR_PRIVATE_KEY: ${{ secrets.MTR_PRIVATE_KEY }}
+        COSIGN_PASSWORD: ${{ secrets.MTR_PRIVATE_KEY_PASSWORD }}
