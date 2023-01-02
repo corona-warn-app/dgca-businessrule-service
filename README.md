@@ -51,7 +51,7 @@ Our commitment to open source means that we are enabling -in fact encouraging- a
 
 ## Licensing
 
-Copyright (C) 2022-2023 T-Systems International GmbH and all other contributors
+Copyright (C) 2021-2023 T-Systems International GmbH and all other contributors
 
 Licensed under the **Apache License, Version 2.0** (the "License"); you may not use this file except in compliance with the License.
 
