@@ -75,6 +75,13 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         }
     }
 
+    /**
+     * Global Exception Handler to wrap exceptions into a readable JSON Object.
+     *
+     * @param e the thrown exception
+     * @param request  the thrown WebRequest
+     * @return ResponseEntity with readable data.
+     */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ProblemReportDto> handleException(ResponseStatusException e, WebRequest request) {
         DgcaBusinessRulesResponseException de = (DgcaBusinessRulesResponseException) e;
