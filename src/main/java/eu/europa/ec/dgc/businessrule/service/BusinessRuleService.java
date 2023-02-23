@@ -29,13 +29,13 @@ import eu.europa.ec.dgc.businessrule.repository.SignedListRepository;
 import eu.europa.ec.dgc.businessrule.restapi.dto.BusinessRuleListItemDto;
 import eu.europa.ec.dgc.businessrule.utils.BusinessRulesUtils;
 import eu.europa.ec.dgc.gateway.connector.model.ValidationRule;
+import jakarta.annotation.PostConstruct;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -51,6 +51,7 @@ public class BusinessRuleService {
 
     private final BusinessRuleRepository businessRuleRepository;
     private final ListSigningService listSigningService;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<SigningService> signingService;
     private final SignedListRepository signedListRepository;
 
@@ -72,8 +73,7 @@ public class BusinessRuleService {
     @Cacheable("business_rules")
     public List<BusinessRuleListItemDto> getBusinessRulesList() {
         log.debug("Get Rules list executed.");
-        List<BusinessRuleListItemDto> rulesItems = businessRuleRepository.findAllByOrderByIdentifierAsc();
-        return rulesItems;
+        return businessRuleRepository.findAllByOrderByIdentifierAsc();
     }
 
     @Cacheable("business_rules")
@@ -88,9 +88,7 @@ public class BusinessRuleService {
     @Cacheable("business_rules")
     public List<BusinessRuleListItemDto> getBusinessRulesListForCountry(String country) {
         log.debug("Get Rules list for country ({}) executed.", country);
-        List<BusinessRuleListItemDto> rulesItems =
-            businessRuleRepository.findAllByCountryOrderByIdentifierAsc(country.toUpperCase(Locale.ROOT));
-        return rulesItems;
+        return businessRuleRepository.findAllByCountryOrderByIdentifierAsc(country.toUpperCase(Locale.ROOT));
     }
 
     /**f
@@ -141,9 +139,7 @@ public class BusinessRuleService {
         bre.setVersion(rule.getVersion());
         bre.setRawData(rule.getRawData());
 
-        if (signingService.isPresent()) {
-            bre.setSignature(signingService.get().computeSignature(bre.getHash()));
-        }
+        signingService.ifPresent(service -> bre.setSignature(service.computeSignature(bre.getHash())));
 
         businessRuleRepository.save(bre);
     }

@@ -21,6 +21,7 @@
 package eu.europa.ec.dgc.businessrule.service;
 
 import eu.europa.ec.dgc.businessrule.config.DgcConfigProperties;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -34,7 +35,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.PostConstruct;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
