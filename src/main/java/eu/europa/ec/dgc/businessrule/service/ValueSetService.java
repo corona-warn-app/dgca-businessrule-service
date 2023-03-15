@@ -28,13 +28,13 @@ import eu.europa.ec.dgc.businessrule.repository.SignedListRepository;
 import eu.europa.ec.dgc.businessrule.repository.ValueSetRepository;
 import eu.europa.ec.dgc.businessrule.restapi.dto.ValueSetListItemDto;
 import eu.europa.ec.dgc.businessrule.utils.BusinessRulesUtils;
+import jakarta.annotation.PostConstruct;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -52,6 +52,7 @@ public class ValueSetService {
     private final ValueSetRepository valueSetRepository;
     private final ListSigningService listSigningService;
     private final SignedListRepository signedListRepository;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<SigningService> signingService;
 
     /**
@@ -69,8 +70,7 @@ public class ValueSetService {
     @Cacheable("value_sets")
     public List<ValueSetListItemDto> getValueSetsList() {
         log.debug("Get value sets list executed");
-        List<ValueSetListItemDto> valueSetItems = valueSetRepository.findAllByOrderByIdAsc();
-        return valueSetItems;
+        return valueSetRepository.findAllByOrderByIdAsc();
     }
 
     @Cacheable("value_sets")
@@ -137,9 +137,7 @@ public class ValueSetService {
         vse.setId(valueSetName);
         vse.setRawData(valueSetData);
 
-        if (signingService.isPresent()) {
-            vse.setSignature(signingService.get().computeSignature(vse.getHash()));
-        }
+        signingService.ifPresent(service -> vse.setSignature(service.computeSignature(vse.getHash())));
 
         valueSetRepository.save(vse);
     }

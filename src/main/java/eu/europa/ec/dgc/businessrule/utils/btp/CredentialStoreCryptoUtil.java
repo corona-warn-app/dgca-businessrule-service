@@ -24,6 +24,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSADecrypter;
+import jakarta.annotation.PostConstruct;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -33,9 +34,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.util.Base64;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -56,8 +55,6 @@ public class CredentialStoreCryptoUtil {
 
     private PrivateKey ownPrivateKey;
 
-    private PublicKey serverPublicKey;
-
     @PostConstruct
     private void prepare() throws NoSuchAlgorithmException, InvalidKeySpecException {
         if (!encryptionEnabled) {
@@ -71,11 +68,7 @@ public class CredentialStoreCryptoUtil {
 
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(Base64.getDecoder()
             .decode(serverPublicKeyBase64));
-        this.serverPublicKey = rsaKeyFactory.generatePublic(x509EncodedKeySpec);
-    }
-
-    protected void encrypt() {
-        throw new NotImplementedException("Encryption is still to be implemented yet.");
+        PublicKey serverPublicKey = rsaKeyFactory.generatePublic(x509EncodedKeySpec);
     }
 
     protected String decrypt(String jweResponse) {

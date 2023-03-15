@@ -34,9 +34,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import java.util.List;
+import jakarta.validation.Valid;
 import java.util.Optional;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -91,11 +90,11 @@ public class DomesticRuleController {
                     array = @ArraySchema(schema = @Schema(implementation = DomesticRuleListItemDto.class))))
         }
     )
-    public ResponseEntity<List<DomesticRuleListItemDto>> getRules(
+    public ResponseEntity<Object> getRules(
         @RequestHeader(value = API_VERSION_HEADER, required = false) String apiVersion
     ) {
         Optional<SignedListEntity> rulesList = domesticRuleService.getRulesSignedList();
-        ResponseEntity responseEntity;
+        ResponseEntity<Object> responseEntity;
         if (rulesList.isPresent()) {
             ResponseEntity.BodyBuilder respBuilder = ResponseEntity.ok();
             String signature = rulesList.get().getSignature();
@@ -143,27 +142,27 @@ public class DomesticRuleController {
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = String.class),
                     examples = {
-                        @ExampleObject(value = "{\n"
-                            + "  \"Identifier\": \"VR-DE-1\",\n"
-                            + "  \"Version\": \"1.0.0\",\n"
-                            + "  \"SchemaVersion\":\"1.0.0\",\n"
-                            + "  \"Engine\":\"CERTLOGIC\",\n"
-                            + "  \"EngineVersion\":\"1.0.0\",\n"
-                            + "  \"Type\":\"Acceptance\",\n"
-                            + "  \"Country\":\"DE\",\n"
-                            + "  \"CertificateType\":\"Vaccination\",\n"
-                            + "  \"Description\":[{\"lang\":\"en\",\"desc\":\"Vaccination must be from June and "
-                            + "doses must be 2\"}],\n"
-                            + "  \"ValidFrom\":\"2021-06-27T07:46:40Z\",\n"
-                            + "  \"ValidTo\":\"2021-08-01T07:46:40Z\",\n"
-                            + "  \"AffectedFields\":[\"dt\",\"dn\"],\n"
-                            + "  \"Logic\":{\n"
-                            + "    \"and\": [\n"
-                            + "      {\">=\":[ {\"var\":\"dt\"}, \"2021-06-01T00:00:00Z\" ]},\n"
-                            + "      {\">=\":[ {\"var\":\"dn\"}, 2 ]}\n"
-                            + "    ]\n"
-                            + "  }\n"
-                            + "}")
+                        @ExampleObject(value = """
+                          {
+                            "Identifier": "VR-DE-1",
+                            "Version": "1.0.0",
+                            "SchemaVersion":"1.0.0",
+                            "Engine":"CERTLOGIC",
+                            "EngineVersion":"1.0.0",
+                            "Type":"Acceptance",
+                            "Country":"DE",
+                            "CertificateType":"Vaccination",
+                            "Description":[{"lang":"en","desc":"Vaccination must be from June and doses must be 2"}],
+                            "ValidFrom":"2021-06-27T07:46:40Z",
+                            "ValidTo":"2021-08-01T07:46:40Z",
+                            "AffectedFields":["dt","dn"],
+                            "Logic":{
+                              "and": [
+                                {">=":[ {"var":"dt"}, "2021-06-01T00:00:00Z" ]},
+                                {">=":[ {"var":"dn"}, 2 ]}
+                              ]
+                            }
+                          }""")
                     })),
             @ApiResponse(
                 responseCode = "404",

@@ -27,7 +27,6 @@ import eu.europa.ec.dgc.businessrule.exception.DgcaBusinessRulesResponseExceptio
 import eu.europa.ec.dgc.businessrule.restapi.dto.ProblemReportDto;
 import eu.europa.ec.dgc.businessrule.restapi.dto.ValueSetListItemDto;
 import eu.europa.ec.dgc.businessrule.service.ValueSetService;
-import eu.europa.ec.dgc.businessrule.utils.BusinessRulesUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -36,12 +35,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import java.util.List;
+import jakarta.validation.Valid;
 import java.util.Optional;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,8 +56,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ValueSetController {
 
     private static final String API_VERSION_HEADER = "X-VERSION";
-
-    private final BusinessRulesUtils businessRulesUtils;
 
     private final ValueSetService valueSetService;
 
@@ -91,55 +86,58 @@ public class ValueSetController {
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     array = @ArraySchema(schema = @Schema(implementation = ValueSetListItemDto.class)),
                     examples = {
-                        @ExampleObject(value = "[\n"
-                            + "    {\n"
-                            + "        \"id\": \"country-2-codes\",\n"
-                            + "        \"hash\": \"923e4e556fe7936e4a3e92e76cfb3aa87be1bf30000b4df3b755247042eea0e7\"\n"
-                            + "    },\n"
-                            + "    {\n"
-                            + "        \"id\": \"covid-19-lab-result\",\n"
-                            + "        \"hash\": \"934e145e9bb1f560d1d3b1ec767ce3a4e9f86ae101260ed04a5cef8c1f5636c4\"\n"
-                            + "    },\n"
-                            + "    {\n"
-                            + "        \"id\": \"covid-19-lab-test-manufacturer-and-name\",\n"
-                            + "        \"hash\": \"9da3ed15d036c20339647f8db1cb67bfcfbd04575e10b0c0df8e55a76a173a97\"\n"
-                            + "    },\n"
-                            + "    {\n"
-                            + "        \"id\": \"covid-19-lab-test-type\",\n"
-                            + "        \"hash\": \"50ba87d7c774cd9d77e4d82f6ab34871119bc4ad51b5b6fa1100efa687be0094\"\n"
-                            + "    },\n"
-                            + "    {\n"
-                            + "        \"id\": \"disease-agent-targeted\",\n"
-                            + "        \"hash\": \"d4bfba1fd9f2eb29dfb2938220468ccb0b481d348f192e6015d36da4b911a83a\"\n"
-                            + "    },\n"
-                            + "    {\n"
-                            + "        \"id\": \"sct-vaccines-covid-19\",\n"
-                            + "        \"hash\": \"70505eab33ac1da351f782ee2e78e89451226c47360e7b89b8a6295bbb70eed6\"\n"
-                            + "    },\n"
-                            + "    {\n"
-                            + "        \"id\": \"vaccines-covid-19-auth-holders\",\n"
-                            + "        \"hash\": \"55af9c705a95ced1a7d9130043f71a7a01f72e168dbd451d23d1575962518ab6\"\n"
-                            + "    },\n"
-                            + "    {\n"
-                            + "        \"id\": \"vaccines-covid-19-names\",\n"
-                            + "        \"hash\": \"8651c3db9ed5332c8fa42943d4656d442a5264debc8482b6d11d4c9176149146\"\n"
-                            + "    }\n"
-                            + "]")
+                        @ExampleObject(value = """
+                            [
+                                {
+                                    "id": "country-2-codes",
+                                    "hash": "923e4e556fe7936e4a3e92e76cfb3aa87be1bf30000b4df3b755247042eea0e7"
+                                },
+                                {
+                                    "id": "covid-19-lab-result",
+                                    "hash": "934e145e9bb1f560d1d3b1ec767ce3a4e9f86ae101260ed04a5cef8c1f5636c4"
+                                },
+                                {
+                                    "id": "covid-19-lab-test-manufacturer-and-name",
+                                    "hash": "9da3ed15d036c20339647f8db1cb67bfcfbd04575e10b0c0df8e55a76a173a97"
+                                },
+                                {
+                                    "id": "covid-19-lab-test-type",
+                                    "hash": "50ba87d7c774cd9d77e4d82f6ab34871119bc4ad51b5b6fa1100efa687be0094"
+                                },
+                                {
+                                    "id": "disease-agent-targeted",
+                                    "hash": "d4bfba1fd9f2eb29dfb2938220468ccb0b481d348f192e6015d36da4b911a83a"
+                                },
+                                {
+                                    "id": "sct-vaccines-covid-19",
+                                    "hash": "70505eab33ac1da351f782ee2e78e89451226c47360e7b89b8a6295bbb70eed6"
+                                },
+                                {
+                                    "id": "vaccines-covid-19-auth-holders",
+                                    "hash": "55af9c705a95ced1a7d9130043f71a7a01f72e168dbd451d23d1575962518ab6"
+                                },
+                                {
+                                    "id": "vaccines-covid-19-names",
+                                    "hash": "8651c3db9ed5332c8fa42943d4656d442a5264debc8482b6d11d4c9176149146"
+                                }
+                            ]""")
                     }))
         }
     )
-    public ResponseEntity<List<ValueSetListItemDto>> getValueSetList(
+    public ResponseEntity<Object> getValueSetList(
         @RequestHeader(value = API_VERSION_HEADER, required = false) String apiVersion
     ) {
         Optional<SignedListEntity> rulesList = valueSetService.getValueSetsSignedList();
-        ResponseEntity responseEntity;
+        ResponseEntity<Object> responseEntity;
         if (rulesList.isPresent()) {
             ResponseEntity.BodyBuilder respBuilder = ResponseEntity.ok();
             String signature = rulesList.get().getSignature();
-            if (signature != null & signature.length() > 0) {
-                HttpHeaders responseHeaders = new HttpHeaders();
-                responseHeaders.set(BusinessRuleController.X_SIGNATURE_HEADER, signature);
-                respBuilder.headers(responseHeaders);
+            if (signature != null) {
+                if (signature.length() > 0) {
+                    HttpHeaders responseHeaders = new HttpHeaders();
+                    responseHeaders.set(BusinessRuleController.X_SIGNATURE_HEADER, signature);
+                    respBuilder.headers(responseHeaders);
+                }
             }
             responseEntity = respBuilder.body(rulesList.get().getRawData());
         } else {
@@ -179,19 +177,20 @@ public class ValueSetController {
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = String.class),
                     examples = {
-                        @ExampleObject(value = "{\n"
-                            + "    \"valueSetId\": \"disease-agent-targeted\",\n"
-                            + "    \"valueSetDate\": \"2021-04-27\",\n"
-                            + "    \"valueSetValues\": {\n"
-                            + "        \"840539006\": {\n"
-                            + "            \"display\": \"COVID-19\",\n"
-                            + "            \"lang\": \"en\",\n"
-                            + "            \"active\": true,\n"
-                            + "            \"version\": \"http://snomed.info/sct/900000000000207008/version/20210131\",\n"
-                            + "            \"system\": \"http://snomed.info/sct\"\n"
-                            + "        }\n"
-                            + "    }\n"
-                            + "}")
+                        @ExampleObject(value = """
+                            {
+                                "valueSetId": "disease-agent-targeted",
+                                "valueSetDate": "2021-04-27",
+                                "valueSetValues": {
+                                    "840539006": {
+                                        "display": "COVID-19",
+                                        "lang": "en",
+                                        "active": true,
+                                        "version": "http://snomed.info/sct/900000000000207008/version/20210131",
+                                        "system": "http://snomed.info/sct"
+                                    }
+                                }
+                            }""")
                     })),
             @ApiResponse(
                 responseCode = "404",
