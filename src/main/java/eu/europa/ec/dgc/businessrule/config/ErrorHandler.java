@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -62,15 +63,31 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         if (e instanceof ResponseStatusException) {
             DgcaBusinessRulesResponseException de = (DgcaBusinessRulesResponseException) e;
             return ResponseEntity
-                .status(((ResponseStatusException) e).getStatus())
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(new ProblemReportDto(de.getCode(), de.getProblem(), de.getSentValues(), de.getDetails()));
+              .status(((ResponseStatusException) e).getStatusCode())
+              .contentType(MediaType.APPLICATION_JSON)
+              .body(new ProblemReportDto(de.getCode(), de.getProblem(), de.getSentValues(), de.getDetails()));
         } else {
             log.error("Uncatched exception", e);
             return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(new ProblemReportDto("0x500", "Internal Server Error", "", ""));
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .contentType(MediaType.APPLICATION_JSON)
+              .body(new ProblemReportDto("0x500", "Internal Server Error", "", ""));
         }
+    }
+
+    /**
+     * Global Exception Handler to wrap exceptions into a readable JSON Object.
+     *
+     * @param e the thrown exception
+     * @param request  the thrown WebRequest
+     * @return ResponseEntity with readable data.
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ProblemReportDto> handleException(ResponseStatusException e, WebRequest request) {
+        DgcaBusinessRulesResponseException de = (DgcaBusinessRulesResponseException) e;
+        return ResponseEntity
+          .status(e.getStatusCode())
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(new ProblemReportDto(de.getCode(), de.getProblem(), de.getSentValues(), de.getDetails()));
     }
 }

@@ -25,13 +25,13 @@ import eu.europa.ec.dgc.businessrule.entity.SignedListEntity;
 import eu.europa.ec.dgc.businessrule.model.DomesticRuleItem;
 import eu.europa.ec.dgc.businessrule.repository.SignedListRepository;
 import eu.europa.ec.dgc.businessrule.restapi.dto.DomesticRuleListItemDto;
+import jakarta.annotation.PostConstruct;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,6 +45,7 @@ public class DomesticRuleService {
 
     private final Map<String, DomesticRuleItem> domesticRuleMap = new HashMap<>();
     private final ListSigningService listSigningService;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<SigningService> signingService;
     private final SignedListRepository signedListRepository;
 
